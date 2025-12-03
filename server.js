@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const supabase = require('./supabaseClient');
 const ValidadorCedula = require('./validator');
 
@@ -11,10 +10,25 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
 
+// Ruta principal - información de la API
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.json({
+    mensaje: "API Validador de Cédula Dominicana",
+    proyecto: 'Validador de Cédula Dominicana',
+    autor: 'Arowarlin',
+    universidad: 'Universidad Autónoma de Santo Domingo (UASD)',
+    algoritmo: 'Módulo 10',
+    version: '1.0.0',
+    status: 'running ✅',
+    endpoints: {
+      info: '/api/info',
+      validar: '/api/validar',
+      historial: '/api/historial',
+      estadisticas: '/api/estadisticas',
+      eliminar: '/api/historial/:id'
+    }
+  });
 });
 
 app.get('/api/info', (req, res) => {
@@ -162,6 +176,14 @@ app.delete('/api/historial/:id', async (req, res) => {
       detalle: error.message
     });
   }
+});
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString() 
+  });
 });
 
 app.listen(PORT, () => {
